@@ -30,45 +30,26 @@
 			$dataArr = json_decode(hex2bin($dataHex));
 			$fileContentHex = $dataArr->file_hex;
 
-			$fileSignature = strtoupper(substr($fileContentHex, 0, 20));
+			$binData = hex2bin($fileContentHex);
+			$file = bin_data_to_file($binData);
+				
+			if (is_array($file)) 
+				{
 
-			if(strpos($fileSignature, "FFD8FF") === 0)
-			{
-				$fileExtension = "jpg";
-				$fileDataType = "image/jpeg";
-			}
-			elseif(strpos($fileSignature, "474946") === 0)
-			{
-				$fileExtension = "gif";
-				$fileDataType = "image/".$fileExtension;
-			}
-			elseif(strpos($fileSignature, "89504E") === 0)
-			{
-				$fileExtension = "png";
-				$fileDataType = "image/".$fileExtension;
-			}
-			elseif(strpos($fileSignature, "424D") === 0)
-			{
-				$fileExtension = "bmp";
-				$fileDataType = "image/".$fileExtension;
-			}
-			elseif(strpos($fileSignature, "492049") === 0)
-			{
-				$fileExtension = "tif";
-				$fileDataType = "image/".$fileExtension;
-			}
-			elseif(strpos($fileSignature, "25504446") === 0)
-			{
-				$fileExtension = "pdf";
-				$fileDataType = "application/".$fileExtension;
-			}
-			else
-			{
-				throw new Exception("File type not supported. Signature - " . $fileContentHex);
-			}
-
-			$downloadURL = "data:".$fileDataType.";base64,".base64_encode(pack('H*', $fileContentHex));
-			echo "<script>window.onload=function(){window.open('".$downloadURL."', '_self')}</script>";
+					if (strlen($file['mimetype']))
+						header('Content-Type: '.$file['mimetype']);
+					
+					if (strlen($file['filename'])) 
+						{
+							// for compatibility with HTTP headers and all browsers
+							$filename=preg_replace('/[^A-Za-z0-9 \\._-]+/', '', $file['filename']);
+							header('Content-Disposition: attachment; filename="'.$filename.'"');
+						}
+				
+				echo $file['content'];
+			
+			} else
+				echo 'File not formatted as expected';
 			
 		}
 		else

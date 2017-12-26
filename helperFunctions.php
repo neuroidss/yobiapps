@@ -64,6 +64,27 @@
 	}
 
 
+	function bin_data_to_file($data)
+	{
+		$parts=explode("\x00", $data, 4);
+		
+		if ( (count($parts)!=4) || ($parts[0]!='') )
+			return null;
+		
+		return array(
+			'filename' => $parts[1],
+			'mimetype' => $parts[2],
+			'content' => $parts[3],
+		);
+	}
+
+
+	function file_to_txout_bin($filename, $mimetype, $content)
+	{
+		return "\x00".$filename."\x00".$mimetype."\x00".$content;
+	}
+
+
 	function getFileDataType($fileSignature)
 	{
 		if(strpos($fileSignature, "FFD8FF") === 0)

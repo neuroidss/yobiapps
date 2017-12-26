@@ -20,7 +20,9 @@
 
 		/// Reading file contents
 			$handle = fopen($target_file, "rb");
-			$fileContentHex = bin2hex(fread($handle, filesize($target_file)));
+			$file_bin_data = fread($handle, filesize($target_file));
+			$file_bin_data = file_to_txout_bin($_FILES['filename']['name'], $_FILES['filename']['type'], $file_bin_data);
+			$fileContentHex = bin2hex($file_bin_data);
 			fclose($handle);
 
 			$contentArr = array(
@@ -50,4 +52,5 @@
 		echo "<font color='red'><b>".$ex->getMessage()."</b></font>";
 	}
 
+	ob_end_flush();
 ?>
